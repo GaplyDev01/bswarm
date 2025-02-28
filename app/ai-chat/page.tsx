@@ -565,7 +565,7 @@ export default function AIChat() {
                       key={index}
                       variant="outline"
                       className="w-full justify-start text-left suggested-question"
-                      onClick={() => handleSuggestedQuestion(question)}
+                      onClick={() => _handleSuggestedQuestion(question)}
                       disabled={isLoading}
                     >
                       <ArrowDown size={14} className="mr-2 text-emerald-400" />
