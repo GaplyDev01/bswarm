@@ -1,6 +1,6 @@
 {
   "regions": ["iad1"],
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build:deploy",
   "installCommand": "npm install",
   "framework": "nextjs",
   "crons": [
