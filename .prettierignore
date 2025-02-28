@@ -1,0 +1,12 @@
+# Ignore artifacts:
+build
+coverage
+.next
+out
+dist
+node_modules
+public
+.vercel
+
+# Ignore markdown files
+*.md

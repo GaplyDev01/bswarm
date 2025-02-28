@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* TradesXBT Colors */
+    --emerald-400: 52, 211, 153; /* #34d399 */
+    --emerald-500: 16, 185, 129; /* #10b981 */
+    --sapphire-800: 13, 37, 63; /* #0d253f */
+    --sapphire-900: 7, 21, 39; /* #071527 */
+
+    /* Gradients */
+    --txbt-gradient-primary: linear-gradient(
+      135deg,
+      rgba(var(--emerald-400), 0.8),
+      rgba(var(--emerald-500), 0.6)
+    );
+    --txbt-gradient-dark: linear-gradient(
+      135deg,
+      rgba(var(--sapphire-800), 0.9),
+      rgba(var(--sapphire-900), 0.95)
+    );
+
+    /* UI States */
+    --success: 52, 211, 153; /* emerald-400 */
+    --warning: 251, 191, 36; /* amber-400 */
+    --error: 248, 113, 113; /* red-400 */
+    --info: 96, 165, 250; /* blue-400 */
+
+    /* Text Colors */
+    --text-primary: 52, 211, 153; /* emerald-400 */
+    --text-secondary: 52, 211, 153; /* emerald-400 with opacity */
+    --text-disabled: 52, 211, 153; /* emerald-400 with more opacity */
+
+    /* Background and UI elements */
+    --background-dark: 7, 21, 39; /* sapphire-900 */
+    --background-panel: 13, 37, 63; /* sapphire-800 */
+    --background-field: 17, 42, 70; /* slightly lighter than sapphire-800 */
+    --border-light: 52, 211, 153; /* emerald-400 with opacity */
+
+    /* ShadCN Theme Variables - High Contrast Theme */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 6.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 6.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 160 84% 39%;
+    --radius: 0.5rem;
+  }
+}
+
+/* TradesXBT typography and base styles */
+@layer base {
+  body {
+    @apply bg-sapphire-900 text-emerald-400 antialiased;
+    background-color: rgb(var(--background-dark));
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  .font-cyber {
+    font-family: var(--font-rajdhani);
+    letter-spacing: 0.05em;
+  }
+}
+
+@layer components {
+  /* Component styling */
+  .txbt-message {
+    @apply bg-sapphire-800/50 backdrop-blur-sm border border-emerald-400/20 px-4 py-3;
+  }
+
+  .txbt-badge {
+    @apply inline-flex items-center border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400 font-cyber uppercase tracking-wider;
+  }
+
+  .txbt-button {
+    @apply inline-flex items-center justify-center bg-emerald-400 px-4 py-2 text-sm font-medium text-sapphire-900 shadow transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:ring-offset-2 font-cyber uppercase tracking-wider;
+  }
+
+  .txbt-button-secondary {
+    @apply inline-flex items-center justify-center border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-400 shadow transition-colors hover:bg-emerald-400/20 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:ring-offset-2 font-cyber uppercase tracking-wider;
+  }
+
+  /* Glow effects */
+  .txbt-glow {
+    box-shadow: 0 0 15px rgba(var(--emerald-400), 0.5);
+  }
+
+  .txbt-text-glow {
+    text-shadow: 0 0 8px rgba(var(--emerald-400), 0.6);
+  }
+}
+
+/* Custom scrollbar for the app */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(var(--sapphire-900), 0.8);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--emerald-400), 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--emerald-400), 0.4);
+}
+
+/* Animations */
+@keyframes pulse-txbt {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-txbt {
+  animation: pulse-txbt 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Loading indicator */
+.dots-loading {
+  display: inline-flex;
+  align-items: center;
+}
+
+.dots-loading span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgb(var(--emerald-400));
+  margin: 0 2px;
+  animation: pulse-txbt 1.4s infinite ease-in-out both;
+}
+
+.dots-loading span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.dots-loading span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+/* Image handling */
+img.emoji {
+  height: 1em;
+  width: 1em;
+  margin: 0 0.05em 0 0.1em;
+  vertical-align: -0.1em;
+}
+
+/* Grid background pattern */
+.grid-bg-pattern {
+  background-image:
+    linear-gradient(rgba(var(--emerald-400), 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--emerald-400), 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center center;
+}
+
+/* Tech pattern background */
+.bg-tech-pattern {
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(var(--emerald-400), 0.1) 5%, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(var(--emerald-400), 0.05) 20%, transparent 50%);
+}
+
+/* Decorative elements */
+.line-decoration::before,
+.line-decoration::after {
+  content: '';
+  position: absolute;
+  background: linear-gradient(to right, transparent, rgba(var(--emerald-400), 0.3), transparent);
+  height: 1px;
+  width: 100%;
+  left: 0;
+}
+
+.line-decoration::before {
+  top: 0;
+}
+
+.line-decoration::after {
+  bottom: 0;
+}

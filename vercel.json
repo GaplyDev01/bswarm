@@ -1,0 +1,27 @@
+{
+  "regions": ["iad1"],
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/cron/update-tokens",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-market-data",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/generate-trading-signals",
+      "schedule": "0 */4 * * *"
+    },
+    {
+      "path": "/api/cron/update-positions",
+      "schedule": "*/10 * * * *"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_SITE_URL": "https://txbt.vercel.app"
+  }
+}

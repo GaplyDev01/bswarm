@@ -1,0 +1,128 @@
+/* 
+ * HD Enhancement CSS
+ * 
+ * This file improves sharpness, contrast and focus without
+ * changing the color scheme of the application.
+ */
+
+/* Global text sharpening and contrast enhancement */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Improve text contrast while preserving colors */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+button,
+a {
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Make emerald text pop more against dark backgrounds */
+.text-emerald-400,
+[class*='text-emerald'] {
+  text-shadow: 0 0 3px rgba(52, 211, 153, 0.2);
+  font-weight: 500;
+}
+
+/* Crisp borders on UI elements */
+.border,
+[class*='border-'] {
+  border-width: 1px;
+  box-shadow: 0 0 0 0.5px rgba(52, 211, 153, 0.1);
+}
+
+/* Enhance button sharpness */
+button,
+.button,
+[role='button'] {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+button:hover,
+.button:hover,
+[role='button']:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Improve card visuals with subtle depth */
+.card,
+[class*='card'],
+.bg-sapphire-800,
+.bg-sapphire-900 {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(52, 211, 153, 0.05);
+}
+
+/* Enhance contrast for input fields */
+input,
+textarea,
+select {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+/* Sharpen images and graphics */
+img,
+svg {
+  image-rendering: auto;
+  filter: contrast(1.02) saturate(1.05);
+}
+
+/* Enhance gradients and glows */
+[class*='gradient'],
+[class*='glow'] {
+  filter: contrast(1.05);
+  backdrop-filter: blur(12px);
+}
+
+/* Add focus effect to chat messages */
+.agent-message {
+  box-shadow:
+    0 0 0 1px rgba(52, 211, 153, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+/* Enhance data visualizations */
+[class*='chart'],
+canvas {
+  filter: contrast(1.05) saturate(1.05);
+  box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.05);
+}
+
+/* Enhance dropdown menus */
+[role='menu'],
+[role='listbox'] {
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(52, 211, 153, 0.05);
+}
+
+/* Improve focus outlines */
+:focus {
+  outline: 2px solid rgba(52, 211, 153, 0.5);
+  outline-offset: 1px;
+}
+
+/* Enhance code blocks */
+pre,
+code {
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.1);
+}
