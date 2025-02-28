@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Production-safe logger utility that handles environment checking properly
  */

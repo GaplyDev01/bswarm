@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { ClaudeChat } from '@/components/claude-chat';

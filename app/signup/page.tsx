@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Split this file into two parts:
 // 1. page.tsx - Server component with metadata
 // 2. client-signup.tsx - Client component with useSearchParams

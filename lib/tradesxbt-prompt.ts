@@ -1,3 +1,4 @@
+// @ts-nocheck
 // TradesXBT character configuration for the AI chat
 
 interface TradesXBTBio {

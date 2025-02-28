@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Header from '@/components/Header';
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {

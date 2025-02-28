@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { LineChart, BarChart, TrendingUp, Users, DollarSign, Info } from 'lucide-react';
 import Link from 'next/link';

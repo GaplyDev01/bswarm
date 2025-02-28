@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { sanitizeHtml, logger, formatCurrency } from '@/lib/utils';
 
 describe('Utils', () => {

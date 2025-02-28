@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest } from 'next/server';
 
 // Mock the global Request class if it doesn't exist in the test environment

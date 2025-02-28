@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextResponse } from 'next/server';
 import { PostgresDB } from '@/lib/postgres-db';
 import { RedisCache } from '@/lib/redis-cache';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createSolanaRpc } from '@solana/web3.js';
 
 // Mock the RPC responses

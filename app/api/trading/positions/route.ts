@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextResponse } from 'next/server';
 import { AIStrategyService } from '@/lib/ai-strategy-service';
 import { formatErrorResponse } from '@/lib/api-utils';

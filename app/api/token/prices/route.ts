@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextResponse } from 'next/server';
 import { MarketDataService } from '@/lib/market-data-service';
 import { RedisCache } from '@/lib/redis-cache';

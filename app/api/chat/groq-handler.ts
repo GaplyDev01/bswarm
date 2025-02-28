@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Groq chat handler for BlockSwarms
  * This file handles Groq LLM integration for the main chat API

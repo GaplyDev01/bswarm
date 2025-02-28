@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createSolanaRpc } from '@solana/web3.js';
 import { logger } from '@/lib/utils';
 

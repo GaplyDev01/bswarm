@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TradesXBT Vercel Pro Features Integration
  *

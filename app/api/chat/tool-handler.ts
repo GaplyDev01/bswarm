@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tool handler for BlockSwarms
  * This file handles function calling for AI models

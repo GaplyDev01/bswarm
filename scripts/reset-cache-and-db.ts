@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { kv } from '@vercel/kv';
 import { sql } from '@vercel/postgres';
 

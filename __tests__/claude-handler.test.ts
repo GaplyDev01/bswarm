@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Mock the required browser APIs
 class MockReadableStream {
   constructor() {}

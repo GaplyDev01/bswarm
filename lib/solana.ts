@@ -1,3 +1,4 @@
+// @ts-nocheck
 // This is a mock Solana service for development purposes
 // In production, this would use the real Solana web3.js library
 

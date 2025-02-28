@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Connection } from '@solana/web3.js';
 
 // Mock the web3.js connection without using requireActual

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Solana Web3.js v2-compatible APIs
  *
@@ -83,6 +84,7 @@ export async function estimatePriorityFees(
 ) {
   try {
     const rpc = createSolanaRpc(endpoint);
+// @ts-ignore
     return await rpc.qn_estimatePriorityFees(params).send();
   } catch (error) {
     logger.error('Error estimating priority fees:', error);

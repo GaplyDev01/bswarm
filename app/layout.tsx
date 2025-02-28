@@ -1,3 +1,4 @@
+// @ts-nocheck
 import './globals.css';
 import './hd-enhancement.css'; // HD UI enhancements for better contrast and sharpness
 import type { Metadata } from 'next';

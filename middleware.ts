@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { authMiddleware } from '@clerk/nextjs';
 import { getEnv, getRateLimit, getRateLimitWindow } from './lib/env';

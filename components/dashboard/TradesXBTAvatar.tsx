@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 

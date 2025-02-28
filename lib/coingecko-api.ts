@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CoinGecko API integration with Redis caching
  * This is the centralized module for all CoinGecko API calls

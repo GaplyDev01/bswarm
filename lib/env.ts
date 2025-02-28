@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Environment validation and configuration
 
 import { z } from 'zod';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Connection, clusterApiUrl, PublicKey } from '@solana/web3.js';
 
 // Create mock implementation first

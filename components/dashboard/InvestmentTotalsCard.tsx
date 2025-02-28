@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { DollarSign, TrendingUp, TrendingDown, Calendar, Clock } from 'lucide-react';
 

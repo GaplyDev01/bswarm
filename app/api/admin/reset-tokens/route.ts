@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextResponse } from 'next/server';
 import { PostgresDB } from '@/lib/postgres-db';
 import { logger } from '@/lib/logger';

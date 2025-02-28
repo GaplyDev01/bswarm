@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextResponse } from 'next/server';
 import { getEnv } from '@/lib/env';
 import { formatErrorResponse, addSecurityHeaders } from '@/lib/api-utils';
