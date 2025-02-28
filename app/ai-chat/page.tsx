@@ -167,7 +167,7 @@ export default function AIChat() {
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
-    scrollToBottom();
+    _scrollToBottom();
   }, [messages]);
 
   const _scrollToBottom = () => {
