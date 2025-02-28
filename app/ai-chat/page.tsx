@@ -225,8 +225,8 @@ export default function AIChat() {
       ];
 
       // Shuffle and take 6 questions
-      const _shuffled = [...baseQuestions].sort(() => 0.5 - Math.random());
-      setSuggestedQuestions(shuffled.slice(0, 6));
+      const _shuffled = [..._baseQuestions].sort(() => 0.5 - Math.random());
+      setSuggestedQuestions(_shuffled.slice(0, 6));
     };
 
     // Generate questions initially and then every 2 hours
