@@ -147,7 +147,7 @@ export default function AIChat() {
     id: sessionId,
     body: {
       model,
-      userId: getUserId(), // This would normally come from auth
+      userId: _getUserId(), // This would normally come from auth
       traderMode: true,
       tokenData, // Pass token data to the API if provided
     },
