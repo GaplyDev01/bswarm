@@ -186,7 +186,7 @@ export default function AIChat() {
 
     // Use setTimeout to ensure the input value is updated before submission
     setTimeout(() => {
-      handleSubmit(formEvent);
+      handleSubmit(_formEvent);
     }, 100);
   };
 
