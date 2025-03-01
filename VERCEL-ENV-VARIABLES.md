@@ -47,7 +47,9 @@ COINGECKO_API_KEY=your_coingecko_api_key
 
 ## Blockchain Settings
 ```
-SOLANA_RPC_ENDPOINT=https://api.mainnet-beta.solana.com
+NEXT_PUBLIC_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+NEXT_PUBLIC_SOLANA_WSS_URL=wss://api.mainnet-beta.solana.com
+NEXT_PUBLIC_USE_REAL_SOLANA=true
 TRADING_FEE_PERCENTAGE=0.1
 MAX_POSITIONS_PER_USER=10
 ```

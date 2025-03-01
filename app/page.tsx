@@ -38,10 +38,7 @@ export default function HomePage() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const router = useRouter();
 
-  // Redirect to AI Chat page
-  useEffect(() => {
-    router.push('/ai-chat');
-  }, [router]);
+  // No longer redirecting to AI Chat page
 
   useEffect(() => {
     const handleOpenModal = () => setIsJoinModalOpen(true);

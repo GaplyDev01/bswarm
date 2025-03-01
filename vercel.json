@@ -11,17 +11,10 @@
     {
       "path": "/api/cron/refresh-market-data",
       "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron/generate-trading-signals",
-      "schedule": "0 */4 * * *"
-    },
-    {
-      "path": "/api/cron/update-positions",
-      "schedule": "*/10 * * * *"
     }
   ],
   "env": {
-    "NEXT_PUBLIC_SITE_URL": "https://txbt.vercel.app"
+    "NEXT_PUBLIC_SITE_URL": "https://txbt.vercel.app",
+    "NEXT_PUBLIC_USE_REAL_SOLANA": "true"
   }
 }

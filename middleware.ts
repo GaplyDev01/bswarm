@@ -7,13 +7,13 @@ import { checkRateLimit } from './lib/api-utils';
 // Define public routes
 export const publicRoutes = [
   '/',
-  '/login*',
-  '/signup*',
+  '/login(.*)',
+  '/signup(.*)',
   '/api/health',
-  '/api/token/search*',
-  '/api/token/info*',
-  '/api/market/trending*',
-  '/api/market/data*',
+  '/api/token/search(.*)',
+  '/api/token/info(.*)',
+  '/api/market/trending(.*)',
+  '/api/market/data(.*)',
 ];
 
 // Define API rate limit paths

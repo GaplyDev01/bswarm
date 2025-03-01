@@ -31,6 +31,11 @@ const envSchema = z.object({
   AUTH_SECRET: z.string().min(1).optional(),
   CLERK_SECRET_KEY: z.string().min(1).optional(),
 
+  // Solana integration
+  NEXT_PUBLIC_SOLANA_RPC_URL: z.string().optional(),
+  NEXT_PUBLIC_SOLANA_WSS_URL: z.string().optional(),
+  NEXT_PUBLIC_USE_REAL_SOLANA: z.string().optional().default('false'),
+
   // Feature flags
   ENABLE_TRADING: z.string().optional(),
   ENABLE_MOCK_TRADING: z.string().default('true'),
@@ -75,6 +80,8 @@ function getEnvOrThrow(): Env {
             process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/tradesxbt',
           COINGECKO_API_KEY: process.env.COINGECKO_API_KEY || 'demo-key',
           ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || 'demo-key',
+          NEXT_PUBLIC_SOLANA_RPC_URL: process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com',
+          NEXT_PUBLIC_USE_REAL_SOLANA: process.env.NEXT_PUBLIC_USE_REAL_SOLANA || 'false',
           ENABLE_MOCK_TRADING: 'true',
         };
 
@@ -113,6 +120,20 @@ export function isMockTradingEnabled(): boolean {
  */
 export function isLiveTradingEnabled(): boolean {
   return getEnv().ENABLE_TRADING === 'true';
+}
+
+/**
+ * Check if real Solana integration is enabled
+ */
+export function isRealSolanaEnabled(): boolean {
+  return getEnv().NEXT_PUBLIC_USE_REAL_SOLANA === 'true';
+}
+
+/**
+ * Get Solana RPC URL
+ */
+export function getSolanaRpcUrl(): string {
+  return getEnv().NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
 }
 
 /**

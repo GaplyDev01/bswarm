@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Wallet as WalletIcon,
   Copy,
@@ -41,6 +42,18 @@ import {
 import SolanaService, { WalletBalance } from '@/lib/solana';
 import { useAppStore } from '@/lib/store';
 import { logger } from '@/lib/logger';
+
+// Import LiveWalletBalance with client-side only rendering
+const LiveWalletBalance = dynamic(
+  () => import('@/components/wallet/WalletComponents').then((mod) => mod.LiveWalletBalance),
+  { ssr: false }
+);
+
+// Import WalletDashboard with client-side only rendering
+const WalletDashboard = dynamic(
+  () => import('@/components/wallet/WalletDashboard').then((mod) => mod.WalletDashboard), 
+  { ssr: false }
+);
 
 export default function WalletPage() {
   const { connected, walletAddress, balance, setWalletState } = useAppStore();
@@ -169,6 +182,9 @@ export default function WalletPage() {
                 {connected ? (
                   <div className="flex flex-col items-end">
                     <div className="text-2xl font-medium">{formatCurrency(totalValue)}</div>
+                    <div className="mt-1">
+                      <LiveWalletBalance />
+                    </div>
                     <div className="flex space-x-2 mt-2">
                       <Button variant="outline" size="sm" onClick={handleDisconnectWallet}>
                         Disconnect

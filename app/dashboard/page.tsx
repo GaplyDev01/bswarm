@@ -68,10 +68,7 @@ export default function Dashboard() {
   const [dashboardConfig, setDashboardConfig] = useState<DashboardConfig>(DEFAULT_CONFIG);
   const [customizationMode, setCustomizationMode] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-// @ts-ignore
-  const [activeTab, setActiveTab] =
-// @ts-ignore
-    useState<'dashboard' | 'charts'> | 'portfolio' | ('profile' > 'dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'charts' | 'portfolio' | 'profile'>('dashboard');
 
   // Load user's dashboard config from localStorage on component mount
   useEffect(() => {

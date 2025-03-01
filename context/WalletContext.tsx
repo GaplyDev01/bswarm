@@ -3,18 +3,19 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { useAppStore } from '@/lib/store';
-import { PublicKey, Connection } from '@solana/web3.js';
+import { PublicKey, Commitment } from '@solana/web3.js';
 import { WalletAdapterNetwork, WalletReadyState } from '@solana/wallet-adapter-base';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
 import {
   ConnectionProvider,
   WalletProvider,
   useWallet,
-  Wallet as SolanaWallet,
 } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import dynamic from 'next/dynamic';
 import { logger } from '@/lib/logger';
+import { solanaRpc as solanaRpcService } from '@/lib/solana/solanaV2';
+import { LAMPORTS_PER_SOL } from '@/lib/solana/v2';
 
 // Import wallet adapter CSS
 import '@solana/wallet-adapter-react-ui/styles.css';
@@ -66,113 +67,90 @@ const InnerWalletContextProvider = ({
   const [balance, setBalance] = useState<number>(0);
   const { setWalletState } = useAppStore();
 
-  // RPC endpoint for Solana - using a more reliable public endpoint
-  // Testing with Devnet for more stability in development
-  const endpoint =
-    process.env.NODE_ENV === 'production'
-      ? 'https://api.mainnet-beta.solana.com'
-      : 'https://api.devnet.solana.com';
-
-  // Fetch wallet balance
+  // Use the primary RPC endpoint configured in environment variables
+  const primaryRpcEndpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 
+    (process.env.NODE_ENV === 'production' 
+      ? 'https://api.mainnet-beta.solana.com' 
+      : 'https://api.devnet.solana.com');
+      
+  // Fetch wallet balance using our SolanaRpc service
   useEffect(() => {
+    let isMounted = true;
+    let subscriptionId: number | null = null;
+
     async function fetchBalance() {
-      if (!publicKey) return;
+      if (!publicKey || !connected) return;
 
-      // List of fallback endpoints based on environment
-      const endpoints =
-        process.env.NODE_ENV === 'production'
-          ? [
-              'https://api.mainnet-beta.solana.com',
-              'https://solana-mainnet.rpc.extrnode.com',
-              'https://rpc.ankr.com/solana',
-              'https://solana-api.projectserum.com',
-            ]
-          : [
-              'https://api.devnet.solana.com',
-              'https://devnet.genesysgo.net',
-              'https://devnet.api.onfinality.io/public',
-            ];
-
-      let success = false;
-
-      // Try each endpoint until one succeeds
-      for (const rpcEndpoint of endpoints) {
-        if (success) break;
-
-        try {
-          const connection = new Connection(rpcEndpoint, {
-            commitment: 'confirmed',
-            confirmTransactionInitialTimeout: 60000, // 60 second timeout
-          });
-
-          // Use a try-catch block specifically for getBalance
-          try {
-            const lamports = await connection.getBalance(publicKey);
-            const solBalance = lamports / 1_000_000_000; // Convert lamports to SOL
-            setBalance(solBalance);
-
-            // Update global state
-            setWalletState(connected, publicKey.toString(), solBalance);
-
-            // Mark as successful to avoid trying other endpoints
-            success = true;
-            logger.log(`Successfully fetched balance using ${rpcEndpoint}`);
-          } catch (balanceError) {
-            logger.warn(`Error fetching balance from ${rpcEndpoint}:`, balanceError);
-            // Continue to the next endpoint
-          }
-        } catch (connectionError) {
-          logger.warn(`Error connecting to ${rpcEndpoint}:`, connectionError);
-          // Continue to the next endpoint
+      try {
+        // Get initial balance
+        const lamports = await solanaRpcService.getBalance(publicKey.toString());
+        const solBalance = lamports / LAMPORTS_PER_SOL; // Convert lamports to SOL
+        
+        if (isMounted) {
+          setBalance(solBalance);
+          // Update global state
+          setWalletState(connected, publicKey.toString(), solBalance);
         }
-      }
-
-      // If all endpoints failed
-      if (!success) {
-        // Set a mock balance for development to avoid breaking the UI
-        process.env.NODE_ENV === 'production'
-          ? () => {}
-          : logger.warn('Using mock balance for development');
-        setBalance(5.0); // 5 SOL mock balance
-        setWalletState(connected, publicKey.toString(), 5.0);
-      } else {
-        process.env.NODE_ENV === 'production'
-          ? () => {}
-          : logger.error('All RPC endpoints failed to fetch balance');
-        setBalance(0);
+        
+        logger.info(`Fetched balance for ${publicKey.toString().slice(0, 8)}...: ${solBalance} SOL`);
+        
+        // Set up WebSocket subscription for balance updates
+        try {
+          subscriptionId = await solanaRpcService.subscribeToAccount(
+            publicKey.toString(),
+            (accountInfo) => {
+              if (!isMounted) return;
+              
+              const newBalance = accountInfo.lamports / LAMPORTS_PER_SOL;
+              setBalance(newBalance);
+              setWalletState(connected, publicKey.toString(), newBalance);
+              logger.info(`Balance updated to ${newBalance} SOL`);
+            }
+          );
+        } catch (subError) {
+          logger.error('Failed to set up balance subscription:', subError);
+        }
+      } catch (error) {
+        logger.error('Error fetching balance:', error);
+        
+        // Set a fallback balance for development
+        if (process.env.NODE_ENV !== 'production' && isMounted) {
+          const mockBalance = 5.0;
+          setBalance(mockBalance);
+          setWalletState(connected, publicKey.toString(), mockBalance);
+          logger.warn('Using mock balance for development');
+        }
       }
     }
 
     if (connected && publicKey) {
       fetchBalance();
     } else {
+      // Reset balance when disconnected
       setBalance(0);
       setWalletState(false, null, 0);
     }
-  }, [connected, publicKey, connecting, setWalletState]);
 
-  // When wallet connection state changes
-  useEffect(() => {
-    logger.log('Wallet connection state changed:', {
-      connected,
-      publicKey: publicKey?.toString() || null,
-      connecting,
-    });
-  }, [connected, publicKey, connecting]);
+    // Cleanup subscription on unmount or when wallet changes
+    return () => {
+      isMounted = false;
+      if (subscriptionId !== null) {
+        (async () => {
+          try {
+            await solanaRpcService.unsubscribe(subscriptionId);
+            logger.info('Unsubscribed from balance updates');
+          } catch (error) {
+            logger.error('Error unsubscribing from balance updates:', error);
+          }
+        })();
+      }
+    };
+  }, [connected, publicKey, setWalletState]);
 
   // Connect wallet function
   const connect = async () => {
     try {
-      logger.log('WalletContext: Connecting wallet - START');
-
-      logger.log(
-        'WalletContext: Available wallets:',
-        wallets.map(adapter => ({
-          name: adapter.name,
-          publicKey: adapter.publicKey?.toString() || null,
-          readyState: adapter.readyState,
-        }))
-      );
+      logger.info('WalletContext: Connecting wallet');
 
       // Find available wallets
       const availableWallets = wallets.filter(
@@ -181,55 +159,30 @@ const InnerWalletContextProvider = ({
           adapter.readyState === WalletReadyState.Loadable
       );
 
-      logger.log(
-        'WalletContext: Available wallets for connection:',
-        availableWallets.map(adapter => adapter.name)
-      );
+      if (availableWallets.length === 0) {
+        throw new Error('No wallet adapters available');
+      }
 
-      // Look for Phantom wallet first
+      // Look for Phantom wallet first, then Solflare
       const phantomWallet = availableWallets.find(adapter =>
         adapter.name.toLowerCase().includes('phantom')
       );
-
+      
       const walletToSelect = phantomWallet || availableWallets[0];
+      logger.info('WalletContext: Selecting wallet:', walletToSelect.name);
 
-      if (walletToSelect) {
-        logger.log('WalletContext: Selecting wallet:', walletToSelect.name);
+      // Select the wallet
+      select(walletToSelect.name);
 
-        // Select the wallet explicitly
-        select(walletToSelect.name);
+      // Allow time for selection to register
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-        // Wait for selection to register
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        // Try to connect
-        try {
-          logger.log('WalletContext: Attempting to connect wallet');
-          await connectWallet();
-          logger.log('WalletContext: Wallet connected successfully');
-        } catch (connectError: unknown) {
-          logger.error('WalletContext: Error in initial connect attempt:', connectError);
-
-          // Type guard to check if error has expected properties
-          if (
-            connectError &&
-            typeof connectError === 'object' &&
-            'name' in connectError &&
-            connectError.name === 'WalletNotSelectedError'
-          ) {
-            logger.log('WalletContext: Trying direct adapter connection');
-            // Try direct adapter connection through the wallet adapter
-            await connectWallet();
-          } else {
-            throw connectError;
-          }
-        }
-      } else {
-        throw new Error('No wallet adapters available');
-      }
+      // Connect the wallet
+      await connectWallet();
+      logger.info('WalletContext: Wallet connected successfully');
     } catch (error) {
       logger.error('Failed to connect wallet:', error);
-      throw error; // Propagate error to the caller
+      throw error;
     }
   };
 
@@ -237,9 +190,9 @@ const InnerWalletContextProvider = ({
   const disconnect = async () => {
     try {
       await disconnectWallet();
-      logger.log('WalletContext: Wallet disconnected successfully');
+      logger.info('WalletContext: Wallet disconnected');
 
-      // Update state to ensure it's consistent
+      // Update state
       setBalance(0);
       setWalletState(false, null, 0);
     } catch (error) {
@@ -249,7 +202,7 @@ const InnerWalletContextProvider = ({
   };
 
   // Provide the context values
-  const contextValue = {
+  const contextValue: WalletContextType = {
     isConnected: connected,
     isConnecting: connecting,
     walletAddress: publicKey ? publicKey.toString() : null,
@@ -266,21 +219,26 @@ const InnerWalletContextProvider = ({
 export const WalletContextProvider = dynamic(
   () =>
     Promise.resolve(({ children }: { children: ReactNode }) => {
-      // RPC endpoint for Solana - using environment-specific endpoints
-      const endpoint =
-        process.env.NODE_ENV === 'production'
-          ? 'https://api.mainnet-beta.solana.com'
-          : 'https://api.devnet.solana.com';
+      // Get RPC endpoint from environment
+      const endpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 
+        (process.env.NODE_ENV === 'production' 
+          ? 'https://api.mainnet-beta.solana.com' 
+          : 'https://api.devnet.solana.com');
 
       // Define supported wallets
-      const wallets = useMemo(() => [new PhantomWalletAdapter(), new SolflareWalletAdapter()], []);
+      const wallets = useMemo(() => [
+        new PhantomWalletAdapter(), 
+        new SolflareWalletAdapter()
+      ], []);
 
-      // Return provider component with Solana wallet adapters
+      // Return provider with Solana wallet adapters
       return (
         <ConnectionProvider endpoint={endpoint}>
           <WalletProvider wallets={wallets} autoConnect>
             <WalletModalProvider>
-              <InnerWalletContextProvider wallets={wallets}>{children}</InnerWalletContextProvider>
+              <InnerWalletContextProvider wallets={wallets}>
+                {children}
+              </InnerWalletContextProvider>
             </WalletModalProvider>
           </WalletProvider>
         </ConnectionProvider>

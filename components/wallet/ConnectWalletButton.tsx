@@ -1,132 +1,91 @@
-// @ts-nocheck
 'use client';
 
-import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletName, WalletReadyState } from '@solana/wallet-adapter-base';
-import { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useWalletContext } from '@/context/WalletContext';
+import { useAppStore } from '@/lib/store';
 import { logger } from '@/lib/logger';
 
 export function ConnectWalletButton() {
-  const {
-    wallets,
-    select,
-    connected,
-    publicKey,
-    connecting: adapterConnecting,
-    wallet,
-    connect: connectWallet,
-    disconnect: disconnectWallet,
-  } = useWallet();
-  const [connecting, setConnecting] = useState(false);
-  const [selectedWalletName, setSelectedWalletName] = useState<WalletName | null>(null);
+  const { isConnected, isConnecting, walletAddress, connect, disconnect, balance } = useWalletContext();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // When component mounts, try to select Phantom wallet first
-  useEffect(() => {
-    // Only run on first load and if no wallet is selected yet
-    if (!wallet && wallets.length > 0 && !selectedWalletName) {
-      // Find all available wallets (ready to use)
-      const availableWallets = wallets.filter(
-        w =>
-          w.readyState === WalletReadyState.Installed || w.readyState === WalletReadyState.Loadable
-      );
-
-      if (availableWallets.length > 0) {
-        // Try to find Phantom first, fall back to first available
-        const phantomWallet = availableWallets.find(w =>
-          w.adapter.name.toLowerCase().includes('phantom')
-        );
-
-        const walletToSelect = phantomWallet || availableWallets[0];
-        logger.log('Auto-selecting wallet:', walletToSelect.adapter.name);
-
-        // Store the selected wallet name
-        setSelectedWalletName(walletToSelect.adapter.name);
-        // Select the wallet
-        select(walletToSelect.adapter.name);
-      }
-    }
-  }, [wallets, wallet, select, selectedWalletName]);
-
-  const handleConnect = useCallback(async () => {
-    if (connecting) return;
+  const handleConnect = async () => {
+    setIsLoading(true);
+    setError(null);
 
     try {
-      setConnecting(true);
-      logger.log('Button: Connect button clicked');
-
-      // Use the wallet adapter directly
-      await connectWallet();
-
-      logger.log('Button: Wallet connected successfully via adapter');
-// @ts-ignore
-    } catch (error: Event) {
-      logger.error('Button: Failed to connect wallet:', error);
-
-      // Check if wallet extension is actually installed
-      if (
-        error.name === 'WalletNotFoundError' ||
-        (error.message && error.message.includes('not found'))
-      ) {
-        alert('Wallet extension not found. Please install Phantom or Solflare extension.');
-      } else if (error.name === 'WalletNotSelectedError') {
-        alert(
-          'Unable to select wallet. Please make sure your Phantom or Solflare extension is working properly.'
-        );
-      } else {
-        alert(`Error connecting wallet: ${error.message || 'Unknown error'}`);
-      }
+      // Connect using WalletContext adapter first
+      await connect();
+      logger.info('Wallet connected successfully');
+    } catch (err: any) {
+      logger.error('Failed to connect wallet:', err);
+      setError('Could not connect wallet. Please try again.');
     } finally {
-      setConnecting(false);
+      setIsLoading(false);
     }
-  }, [connecting, connectWallet]);
+  };
 
-  const handleDisconnect = useCallback(async () => {
+  const handleDisconnect = async () => {
+    setIsLoading(true);
+    setError(null);
+
     try {
-      logger.log('Button: Disconnect button clicked');
-      await disconnectWallet();
-      logger.log('Button: Wallet disconnected successfully');
-    } catch (error) {
-      logger.error('Button: Failed to disconnect wallet:', error);
+      await disconnect();
+      logger.info('Wallet disconnected successfully');
+    } catch (err: any) {
+      logger.error('Failed to disconnect wallet:', err);
+      setError('Could not disconnect wallet. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-  }, [disconnectWallet]);
+  };
 
-  // If connected, show the connected state
-  if (connected && publicKey) {
+  const displayAddress = walletAddress 
+    ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`
+    : '';
+  
+  const displayBalance = balance.toFixed(2);
+
+  // Show loading state
+  if (isConnecting || isLoading) {
     return (
-      <div className="relative group">
-        <button className="px-4 py-2 text-sm bg-emerald-400/20 border border-emerald-400/50 text-emerald-400 font-cyber uppercase tracking-wide hover:bg-emerald-400/30 transition">
-          {publicKey.toString().slice(0, 4)}...{publicKey.toString().slice(-4)}
-        </button>
+      <button disabled className="px-4 py-2 rounded bg-emerald-700/50 text-emerald-100 cursor-wait">
+        <span className="animate-pulse">Connecting...</span>
+      </button>
+    );
+  }
 
-        <div className="absolute right-0 mt-2 w-56 p-2 bg-sapphire-800 backdrop-blur-md shadow-xl border border-emerald-400/20 z-10 hidden group-hover:block">
-          <div className="p-3 text-xs text-emerald-400/70">
-            <p className="font-cyber text-emerald-400 mb-2 uppercase tracking-wide">
-              Connected Wallet
-            </p>
-            <p className="break-all mb-3 font-mono">{publicKey.toString()}</p>
-            <button
-              onClick={handleDisconnect}
-              className="w-full text-center px-3 py-2 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 transition text-xs font-cyber uppercase tracking-wide"
-            >
-              Disconnect
-            </button>
-          </div>
+  // When connected, show address and balance
+  if (isConnected && walletAddress) {
+    return (
+      <div className="flex flex-col items-end">
+        <div className="flex items-center space-x-2 mb-1">
+          <div className="h-2 w-2 rounded-full bg-emerald-400"></div>
+          <span className="text-sm text-emerald-300">{displayAddress}</span>
         </div>
+        <div className="flex items-center">
+          <span className="text-xs text-emerald-400 mr-2">{displayBalance} SOL</span>
+          <button 
+            onClick={handleDisconnect}
+            className="text-xs px-2 py-1 rounded bg-red-900/30 hover:bg-red-800/50 text-red-300 transition"
+          >
+            Disconnect
+          </button>
+        </div>
+        {error && <div className="text-red-400 text-xs mt-1">{error}</div>}
       </div>
     );
   }
 
+  // Default: Show connect button
   return (
     <button
-      className={`px-4 py-2 text-sm border border-emerald-400/30 font-cyber uppercase tracking-wide transition ${
-        connecting
-          ? 'bg-emerald-400/5 text-emerald-400/50 cursor-not-allowed'
-          : 'bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20'
-      }`}
       onClick={handleConnect}
-      disabled={connecting}
+      className="px-4 py-2 rounded bg-emerald-800/80 hover:bg-emerald-700/80 text-emerald-100 font-cyber transition"
     >
-      {connecting ? 'Connecting...' : 'Connect Wallet'}
+      Connect Wallet
+      {error && <div className="text-red-400 text-xs mt-1">{error}</div>}
     </button>
   );
 }
